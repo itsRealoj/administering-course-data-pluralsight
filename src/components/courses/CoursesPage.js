@@ -1,17 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as courseActions from '../../redux/actions/courseActions';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 
 class CoursesPage extends React.Component {
+  componentDidMount() {
+    this.props.actions.loadCourses().catch((error) => {
+      alert('loading courses failed!' + error);
+    });
+  }
   render() {
     return (
       <>
         <h2>Courses</h2>
-        {this.props.courses.map((course) => {
-          <div key={course.title}>{course.title}</div>;
-        })}
+        {this.props.courses.map((course) => (
+          <div key={course.title}>{course.title}</div>
+        ))}
       </>
     );
   }
@@ -19,15 +24,22 @@ class CoursesPage extends React.Component {
 
 //clarify dispatch is expected
 CoursesPage.propTypes = {
-  dispatch: propTypes.func.isRequired,
+  courses: PropTypes.func.isRequired,
+  actions: PropTypes.object.isRequired,
 };
 
 function mapStateToProps(state) {
   return {
-    course: state.course,
+    courses: state.courses,
   };
 }
 
-const connectedStateAndProps = connect(mapStateToProps);
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch),
+  };
+}
+
+const connectedStateAndProps = connect(mapStateToProps, mapDispatchToProps);
 export default connectedStateAndProps(CoursesPage);
 // export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
